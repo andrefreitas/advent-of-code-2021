@@ -28,6 +28,12 @@ fn count_increments(puzzle: &Vec<u32>) -> u32 {
     return increments;
 }
 
+fn group_in_sliding_windows(puzzle: &Vec<u32>, window: usize) -> Vec<u32> {
+    return (0..=puzzle.len() - window)
+        .map(|index| puzzle[index..index + window].iter().sum())
+        .collect();
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     let filename = &args[1];
@@ -37,4 +43,8 @@ fn main() {
 
     let total_increments: u32 = count_increments(&puzzle);
     println!("Total increments: {}", total_increments);
+
+    let sliding_windows: Vec<u32> = group_in_sliding_windows(&puzzle, 3);
+    let sliding_window_increments = count_increments(&sliding_windows);
+    println!("Sliding window increments: {}", sliding_window_increments);
 }
