@@ -39,7 +39,7 @@ fn read_puzzle_from_file<P: AsRef<Path>>(filename: P) -> Vec<Movement> {
     return puzzle;
 }
 
-fn compute_final_position(puzzle: Vec<Movement>) -> (u32, u32) {
+fn compute_final_position(puzzle: &Vec<Movement>) -> (u32, u32) {
     let mut depth: u32 = 0;
     let mut horizontal: u32 = 0;
 
@@ -54,6 +54,25 @@ fn compute_final_position(puzzle: Vec<Movement>) -> (u32, u32) {
     return (depth, horizontal);
 }
 
+fn compute_final_position_with_aim(puzzle: &Vec<Movement>) -> (u32, u32) {
+    let mut depth: u32 = 0;
+    let mut horizontal: u32 = 0;
+    let mut aim: u32 = 0;
+
+    for movement in puzzle.iter() {
+        match movement.direction {
+            Direction::Up => aim -= movement.amount,
+            Direction::Down => aim += movement.amount,
+            Direction::Forward => {
+                horizontal += movement.amount;
+                depth += aim * movement.amount
+            }
+        }
+    }
+
+    return (depth, horizontal);
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     let filename = &args[1];
@@ -61,11 +80,40 @@ fn main() {
     let puzzle = read_puzzle_from_file(filename);
     println!("Read puzzle {} with {} movements", filename, puzzle.len());
 
-    let (depth, horizontal) = compute_final_position(puzzle);
+    let (depth, horizontal) = compute_final_position(&puzzle);
     println!(
         "Final position is {} (depth), {} (horizontal) which is {}",
         depth,
         horizontal,
         depth * horizontal
     );
+
+    let (depth, horizontal) = compute_final_position_with_aim(&puzzle);
+    println!(
+        "Final position with aim is {} (depth), {} (horizontal) which is {}",
+        depth,
+        horizontal,
+        depth * horizontal
+    );
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn read_easy_puzzle() -> Vec<Movement> {
+        return read_puzzle_from_file("input-easy.txt");
+    }
+
+    #[test]
+    fn test_compute_final_position() {
+        let puzzle = read_easy_puzzle();
+        assert_eq!(compute_final_position(&puzzle), (10, 15));
+    }
+
+    #[test]
+    fn test_compute_final_position_with_aim() {
+        let puzzle = read_easy_puzzle();
+        assert_eq!(compute_final_position_with_aim(&puzzle), (60, 15));
+    }
 }
