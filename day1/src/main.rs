@@ -48,3 +48,21 @@ fn main() {
     let sliding_window_increments = count_increments(&sliding_windows);
     println!("Sliding window increments: {}", sliding_window_increments);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_count_increments_when_0() {
+        assert_eq!(count_increments(&vec![1]), 0);
+    }
+
+    #[test]
+    fn test_count_increments_when_exists() {
+        assert_eq!(
+            count_increments(&vec![199, 200, 208, 210, 200, 207, 240, 269, 260, 263]),
+            7
+        );
+    }
+}
